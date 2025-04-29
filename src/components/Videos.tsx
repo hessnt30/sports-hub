@@ -115,9 +115,9 @@ export default function Video() {
 
   if (!videos) return <p className="p-6">Loading...</p>;
   return (
-    <div className="p-6">
-      <h1>Game Recaps</h1>
-      <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 max-w-3xl">
+    <div className="p-6 max-w-3xl">
+      <h1 className="text-xl font-bold p-2">Game Recaps</h1>
+      <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 max-h-[600px] overflow-y-auto">
         {videos.map((video) => {
           return (
             <li key={video.id}>
@@ -125,6 +125,10 @@ export default function Video() {
                 <a
                   href={`https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`}
                   target="_blank"
+                  title={`View ${video.snippet.title.replace(
+                    " | MLB Highlights",
+                    ""
+                  )} in YouTube (opens in new tab)`}
                 >
                   <p>
                     <Image
@@ -134,7 +138,7 @@ export default function Video() {
                       alt={video.snippet.title}
                     />
                   </p>
-                  <h3 className="">
+                  <h3 className="max-w-xs truncate">
                     {video.snippet.title.replace(" | MLB Highlights", "")}
                   </h3>
                 </a>

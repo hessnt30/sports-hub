@@ -1,5 +1,7 @@
 "use client";
 
+// nationals team id is 120
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
 

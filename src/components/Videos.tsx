@@ -12,6 +12,7 @@ type Video = {
   kind: string;
   etag: string;
   id: string;
+  nextPageToken: string;
   snippet: {
     publishedAt: string;
     channelId: string;
@@ -60,11 +61,34 @@ export default function Video() {
      */
     const fetchVideos = async () => {
       const res = await fetch(
-        `${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=100&playlistId=${PLAYLIST_ID}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+        `${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=200&playlistId=${PLAYLIST_ID}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
       );
 
       const data = await res.json();
-      findTeamVideos("Nationals", data.items as Video[]);
+
+      let allVideos = data.items as Video[];
+
+      if (!data.items) return;
+
+      let pageToken = data.nextPageToken;
+      while (pageToken) {
+        console.log("fetching next page", pageToken);
+        const nextRes = await fetch(
+          `${YOUTUBE_PLAYLIST_ITEMS_API}?part=snippet&maxResults=200&playlistId=${PLAYLIST_ID}&pageToken=${pageToken}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+        );
+
+        const nextData = await nextRes.json();
+
+        if (!nextData || !nextData.nextPageToken) break;
+        allVideos.push(...nextData.items);
+
+        // console.log(allVideos);
+
+        pageToken = nextData.nextPageToken;
+      }
+      console.log("here");
+      console.log("items fetched:", allVideos);
+      findTeamVideos("Nationals", allVideos);
     };
 
     fetchVideos();
@@ -81,7 +105,7 @@ export default function Video() {
    * @returns `null` if `vids` is null
    */
   function findTeamVideos(team: string, vids: Video[]) {
-    if (!vids) return null;
+    if (!vids) return;
     const filteredVids = vids.filter((video) => {
       return video.snippet.title.includes(team);
     });
@@ -91,9 +115,9 @@ export default function Video() {
 
   if (!videos) return <p className="p-6">Loading...</p>;
   return (
-    <div className="p-6">
-      <h1>Game Recaps</h1>
-      <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 max-w-3xl">
+    <div className="p-6 max-w-3xl">
+      <h1 className="text-xl font-bold p-2">Game Recaps</h1>
+      <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 max-h-[600px] overflow-y-auto">
         {videos.map((video) => {
           return (
             <li key={video.id}>
@@ -101,6 +125,10 @@ export default function Video() {
                 <a
                   href={`https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`}
                   target="_blank"
+                  title={`View ${video.snippet.title.replace(
+                    " | MLB Highlights",
+                    ""
+                  )} in YouTube (opens in new tab)`}
                 >
                   <p>
                     <Image
@@ -110,7 +138,7 @@ export default function Video() {
                       alt={video.snippet.title}
                     />
                   </p>
-                  <h3 className="">
+                  <h3 className="max-w-xs truncate">
                     {video.snippet.title.replace(" | MLB Highlights", "")}
                   </h3>
                 </a>

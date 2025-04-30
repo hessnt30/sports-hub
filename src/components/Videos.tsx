@@ -4,58 +4,16 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Video } from "@/types";
 
 const YOUTUBE_PLAYLIST_ITEMS_API =
   "https://www.googleapis.com/youtube/v3/playlistItems";
 
 const PLAYLIST_ID = "PLL-lmlkrmJanq-c41voXY4cCbxVR0bjxR";
 
-type Video = {
-  kind: string;
-  etag: string;
-  id: string;
-  nextPageToken: string;
-  snippet: {
-    publishedAt: string;
-    channelId: string;
-    title: string;
-    description: string;
-    thumbnails: {
-      default: {
-        url: string;
-        width: number;
-        height: number;
-      };
-      medium: {
-        url: string;
-        width: number;
-        height: number;
-      };
-      high: {
-        url: string;
-        width: number;
-        height: number;
-      };
-      standard: {
-        url: string;
-        width: number;
-        height: number;
-      };
-    };
-    channelTitle: string;
-    playlistId: string;
-    position: number;
-    resourceId: {
-      kind: string;
-      videoId: string;
-    };
-    videoOwnerChannelTitle: string;
-    videoOwnerChannelId: string;
-  };
-};
-
-export default function Video() {
-  const [videos, setVideos] = useState<Video[] | null>();
+export default function Videos() {
+  const [videos, setVideos] = useState<Video[] | null>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     /**
@@ -113,17 +71,18 @@ export default function Video() {
     });
     console.log("vids:", filteredVids);
     setVideos(filteredVids);
+    setLoading(false);
   }
 
-  if (!videos) return <p className="p-6">Loading...</p>;
+  if (!videos || loading) return <p className="p-6">Loading...</p>;
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-6 max-w-5xl">
       <h1 className="text-xl font-bold p-2">Game Recaps</h1>
       <ul className="grid grid-cols-1 gap-2 md:grid-cols-2 max-h-[600px] overflow-y-auto">
         {videos.map((video) => {
           return (
             <li key={video.id}>
-              <div className="flex p-4 border border-gray-800 rounded-md max-w-sm">
+              <div className="flex p-4 border border-gray-800 rounded-md justify-center">
                 <a
                   href={`https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`}
                   target="_blank"
@@ -138,9 +97,10 @@ export default function Video() {
                       height={video.snippet.thumbnails.medium.height}
                       src={video.snippet.thumbnails.medium.url}
                       alt={video.snippet.title}
+                      className="object-cover object-center w-full rounded-lg"
                     />
                   </p>
-                  <h3 className="max-w-xs truncate">
+                  <h3 className="max-w-s truncate">
                     {video.snippet.title.replace(" | MLB Highlights", "")}
                   </h3>
                 </a>

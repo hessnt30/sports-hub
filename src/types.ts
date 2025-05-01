@@ -75,3 +75,51 @@ export type GameData = {
   };
   gameDate: string;
 };
+
+export type Team = {
+  springLeague: {
+    id: number;
+    name: string;
+    link: string;
+    abbreviation: string;
+  };
+  allStarStatus: string;
+  id: number;
+  name: string;
+  link: string;
+  season: number;
+  venue: {
+    id: number;
+    name: string;
+    link: string;
+  };
+  springVenue: {
+    id: number;
+    link: string;
+  };
+  teamCode: string;
+  fileCode: string;
+  abbreviation: string;
+  teamName: string;
+  locationName: string;
+  firstYearOfPlay: string;
+  league: {
+    id: number;
+    name: string;
+    link: string;
+  };
+  division: {
+    id: number;
+    name: string;
+    link: string;
+  };
+  sport: {
+    id: number;
+    link: string;
+    name: string;
+  };
+  shortName: string;
+  franchiseName: string;
+  clubName: string;
+  active: boolean;
+};
